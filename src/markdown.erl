@@ -679,7 +679,7 @@ type_ol1(_List, _Acc)              -> normal.
 %% strip trailing #'s as they are decorative only...
 type_atx(List) ->
     {Sz, R} = get_atx_size(List),
-    A = [{{md, atx}, "#"}],
+    A = [{{md, atx}, "="}],
     Type =
         case is_all_hashes(R) of
             true  ->
@@ -924,9 +924,9 @@ l1([$<, $/|T], A1, A2)     -> {Tag, NewT} = closingdiv(T, []),
 l1([$< | T], A1, A2)       -> {Tag, NewT} = openingdiv(T),
                               l1(NewT, [], [Tag , l2(A1) | A2]);
 %% these clauses are the normal lexer clauses
-l1([$= | T], A1, A2)       -> l1(T, [], [{{md, eq}, "="},   l2(A1) | A2]);
+%l1([$= | T], A1, A2)       -> l1(T, [], [{{md, eq}, "="},   l2(A1) | A2]);
 l1([$- | T], A1, A2)       -> l1(T, [], [{{md, dash}, "-"}, l2(A1) | A2]);
-l1([$# | T], A1, A2)       -> l1(T, [], [{{md, atx}, "#"},  l2(A1) | A2]);
+l1([$= | T], A1, A2)       -> l1(T, [], [{{md, atx}, "="},  l2(A1) | A2]);
 l1([$> | T], A1, A2)       -> l1(T, [], [{{md, gt}, ">"},   l2(A1) | A2]);
 l1([$+ | T], A1, A2)       -> l1(T, [], [{{md, plus}, "+"}, l2(A1) | A2]);
 l1([$* | T], A1, A2)       -> l1(T, [], [{{md, star}, "*"}, l2(A1) | A2]);
@@ -1024,21 +1024,7 @@ get_url1([$> | T], Acc)      -> URL = flatten(reverse(Acc)),
 get_url1([H | T], Acc)       -> get_url1(T, [H | Acc]).
 
 get_email_addie(String) ->
-    Snip_regex = ">",
-    case re:run(String, Snip_regex, [unicode]) of
-        nomatch                -> not_email;
-        {match, [{N, _} | _T]} ->
-            {Possible, [$> | T]} = lists:split(N, String),
-            EMail_regex = "[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+"
-                ++ "(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*"
-                ++ "@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+"
-                ++ "(?:[a-zA-Z]{2}|com|org|net|gov|mil"
-                ++ "|biz|info|mobi|name|aero|jobs|museum)",
-            case re:run(Possible, EMail_regex, [unicode]) of
-                nomatch    -> not_email;
-                {match, _} -> {{email, Possible}, T}
-            end
-    end.
+	not_email.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%
